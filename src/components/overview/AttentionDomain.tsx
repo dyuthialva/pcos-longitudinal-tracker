@@ -80,8 +80,9 @@ export const AttentionDomain: React.FC<AttentionDomainProps> = ({ scoreData, onC
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60">
                 <div
-                  className={`h-full rounded-full transition-all duration-300 ${getBarColor(score)}`}
+                  className={`h-full rounded-full transition-all duration-300 attention-bar ${getBarColor(score)}`}
                   style={{ width: `${score ?? 0}%` }}
+                  aria-label={`${domain} attention score ${score} of 100, band ${band}`}
                 />
               </div>
             </div>
