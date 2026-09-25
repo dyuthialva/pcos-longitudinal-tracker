@@ -3,7 +3,6 @@ import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import { DisclaimerBanner } from './DisclaimerBanner';
 import { IdleTimeoutModal } from '../../auth/IdleTimeoutModal';
 import { useAuth } from '../../auth/AuthContext';
 import { useClinicalData } from '../../clinical/ClinicalDataContext';
@@ -39,7 +38,6 @@ export function ClinicalLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
-      <DisclaimerBanner />
       <IdleTimeoutModal
         open={idleWarning}
         onStay={staySignedIn}

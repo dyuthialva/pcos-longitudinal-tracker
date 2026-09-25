@@ -3,7 +3,7 @@ import type { DoctorProfile } from '../types/auth';
 import { ClinicalApiService } from '../services/clinicalApi';
 
 const IDLE_MS = 15 * 60 * 1000;
-const WARN_BEFORE_MS = 2 * 60 * 1000;
+const WARN_BEFORE_MS = 2 * 60* 1000;
 const ACTIVITY_EVENTS: Array<keyof WindowEventMap> = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
 
 interface AuthContextValue {

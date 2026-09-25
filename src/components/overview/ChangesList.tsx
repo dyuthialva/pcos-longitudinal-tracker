@@ -25,14 +25,14 @@ export const ChangesList: React.FC<ChangesListProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-slate-900 m-0">
-              Changes Since Previous Visit
+              Detailed Changes Since Previous Visit
             </h2>
             <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
               {meaningfulDeltas.length} detected
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Meaningful changes detected between the selected visit and the previous visit.
+           Detailed comparison of meaningful changes from the previous visit.
           </p>
         </div>
 

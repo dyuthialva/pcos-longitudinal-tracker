@@ -8,6 +8,7 @@ import { ReasoningCard } from '../overview/ReasoningCard';
 import { TrendChart } from '../trends/TrendChart';
 import { EvidenceTable } from '../evidence/EvidenceTable';
 import { DomainDetailModal } from '../detail/DomainDetailModal';
+import { WhatChangedStrip } from '../overview/WhatChangedStrip';
 
 interface OverviewPageProps {
   patient: Patient;
@@ -28,22 +29,26 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
     <div className="space-y-6 pb-12">
       {/* Patient Header with Visit Selector */}
       <PatientHeader
-        patient={patient}
-        selectedVisit={selectedVisit}
-        onSelectVisit={onSelectVisit}
-      />
+  patient={patient}
+  selectedVisit={selectedVisit}
+  onSelectVisit={onSelectVisit}
+/>
 
-      {/* Primary 2-Column Clinical Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left / Main Column (7 cols): Changes & Attention Map */}
-        <div className="lg:col-span-7 space-y-6">
+<WhatChangedStrip
+  visit={selectedVisit}
+  onSelectDomain={(domain) => setActiveDrillDownDomain(domain as DomainType)}
+/>
+      {/*Two changes done:
+          1.Changed the Overview two-column breakpoint from lg to xl to prevent desktop content from being squeezed
+          2.Added min-w-0 to grid columns so cards and text stay within their allocated width*/}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <div className="xl:col-span-7 space-y-6">       
           {/* Section 1: Changes Since Previous Visit */}
           <ChangesList
             visit={selectedVisit}
             onViewAllObservations={onNavigateToEvidence}
             onDrillDownDomain={(domainStr) => setActiveDrillDownDomain(domainStr as DomainType)}
           />
-
           {/* Section 2: Attention Map */}
           <AttentionMap
             visit={selectedVisit}
@@ -51,8 +56,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           />
         </div>
 
-        {/* Right Column (5 cols): Clinical Context & Longitudinal Trends */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="xl:col-span-5 space-y-6">
           {/* Section 4: Clinical Context Reasoning Card */}
           <ReasoningCard visit={selectedVisit} />
 
