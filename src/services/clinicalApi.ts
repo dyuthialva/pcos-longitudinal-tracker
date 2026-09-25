@@ -23,8 +23,8 @@ const MOCK_DOCTORS: Array<DoctorProfile & { password: string }> = [
 ];
 
 const MOCK_DELAY_MS = 80;
-const MAX_FAILED_ATTEMPTS = 5;
-const LOCKOUT_MS = 60_000;
+const MAX_FAILED_ATTEMPTS = 5; {/* After 5 failed attempts, lockout for 1 minute */}
+const LOCKOUT_MS = 60_000;    {/* 1 minute lockout after too many failed attempts */}
 
 type UnauthorizedHandler = () => void;
 
