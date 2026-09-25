@@ -1,32 +1,67 @@
-# React + TypeScript + Vite
+# PCOS Longitudinal Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A clinician-facing prototype for reviewing **longitudinal PCOS patient data** across visits, trends, meaningful changes, attention areas, and supporting evidence.
 
-Currently, two official plugins are available:
+> **Prototype • Synthetic Data • Decision Support Only**
+> This application is not a diagnostic tool.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it includes
 
-## React Compiler
+* Clinician authentication with protected routes
+* Session persistence and idle-session timeout
+* Failed-login rate limiting and temporary lockout
+* Patient worklist with search and attention-based sorting
+* Patient overview with Attention Map and clinical reasoning
+* Longitudinal visit comparison and meaningful changes
+* "What Changed Most" summary
+* Parameter trends across visits
+* Evidence and observation views
+* Responsive clinician dashboard
+* Mock clinical API with a future FastAPI integration path
+* Basic frontend security headers and session/data handling
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the Oxlint configuration
+* **React**
+* **TypeScript**
+* **Vite**
+* **Tailwind CSS**
+* **React Router**
+* **Context API**
+* **Lucide React**
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Architecture
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+The frontend currently uses a **mock clinical API** with synthetic patients and demo clinician accounts.
+
+The API layer is separated through `clinicalApi.ts`, allowing the application to switch to a FastAPI backend later using:
+
+```env
+VITE_API_BASE_URL=
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+When the variable is empty, the application uses the local mock API.
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+### Demo Login
+
+```text
+Email: dr.mehta@clinic.local
+Password: ClinicianDemo!2026
+```
+
+## Project Status
+
+This is a **development prototype using synthetic data**. It is designed to demonstrate longitudinal clinical decision-support workflows and is not intended for diagnosis or production clinical use.
