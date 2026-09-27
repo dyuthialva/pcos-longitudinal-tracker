@@ -1,0 +1,272 @@
+# PCOS Longitudinal Clinical Decision Support - Scoring & Delta Configuration
+# Based on:
+# 1. 2023 International Evidence-based Guideline for the Assessment and Management of Polycystic Ovary Syndrome (Monash University, ESHRE, ASRM)
+# 2. Rotterdam ESHRE/ASRM-Sponsored PCOS Consensus Workshop Group (2004)
+# 3. WHO / International Diabetes Federation guidelines for metabolic syndrome & ethnicity-specific cutoffs
+
+version: "1.0.0"
+decision_support_notice: "For clinical decision support and longitudinal tracking only. Not a diagnostic tool."
+
+weights:
+  severity: 0.5
+  trend: 0.3
+  symptoms: 0.2
+
+baseline_weights_no_trend:
+  # When no prior visit exists (first visit), trend cannot be evaluated.
+  # Renormalized 0.5 / (0.5 + 0.2) = ~0.714, 0.2 / (0.5 + 0.2) = ~0.286
+  severity: 0.714
+  symptoms: 0.286
+
+completeness:
+  threshold_ratio: 0.60 # Minimum 60% of expected fields required to compute a numeric score
+
+bands:
+  low:
+    min: 0.0
+    max: 29.99
+    label: "Low"
+  moderate:
+    min: 30.0
+    max: 54.99
+    label: "Moderate"
+  moderate_high:
+    min: 55.0
+    max: 74.99
+    label: "Moderate-High"
+  high:
+    min: 75.0
+    max: 100.0
+    label: "High"
+  insufficient_data:
+    label: "Insufficient Data"
+
+population_settings:
+  active_profile: "asian_south_asian" # Options: "standard_who", "asian_south_asian"
+  profiles:
+    standard_who:
+      bmi_overweight: 25.0
+      bmi_obese: 30.0
+      waist_circumference_threshold_cm: 88.0 # WHO cutoff for female abdominal adiposity
+      citation: "WHO Technical Report Series 894 (2000)"
+    asian_south_asian:
+      bmi_overweight: 23.0
+      bmi_obese: 27.5
+      waist_circumference_threshold_cm: 80.0 # IDF / WHO criteria for Asian females
+      citation: "WHO / IASO / IOTF (2000) Redefining Obesity in the Asia-Pacific region"
+
+domains:
+  Reproductive:
+    description: "Ovulatory function, cycle regularity, and menstrual duration"
+    citation: "2023 International PCOS Guideline: Section 1 (Irregular cycles definition: <21 or >35 days, or <8 cycles/year)"
+    expected_fields:
+      - cycle_length
+      - cycle_variability_sd
+      - missed_periods_count
+      - ovulation_signs
+    thresholds:
+      cycle_length_normal_min: 21
+      cycle_length_normal_max: 35
+      cycle_length_oligomenorrhea: 35
+      cycle_length_amenorrhea: 90
+      cycle_variability_sd_elevated: 7.0
+      missed_periods_annual_elevated: 3
+    deltas:
+      cycle_length:
+        meaningful_change: 5.0
+        unit: "days"
+      cycle_variability_sd:
+        meaningful_change: 3.0
+        unit: "days"
+      missed_periods_count:
+        meaningful_change: 1
+        unit: "periods"
+
+  Hyperandrogenism:
+    description: "Biochemical and clinical hyperandrogenism markers"
+    citation: "2023 International PCOS Guideline: Section 2 (Biochemical & clinical hyperandrogenism, modified Ferriman-Gallwey mFG cutoff >= 4-6)"
+    expected_fields:
+      - acne_severity
+      - hirsutism_mfg_score
+      - hair_loss_severity
+      - total_testosterone
+      - free_testosterone
+      - shbg
+      - dheas
+    thresholds:
+      total_testosterone_upper_limit: 0.50 # ng/mL (50 ng/dL)
+      free_testosterone_upper_limit: 5.0 # pg/mL
+      dheas_upper_limit: 270.0 # ug/dL
+      shbg_lower_limit: 30.0 # nmol/L
+      mfg_hirsutism_mild: 4.0
+      mfg_hirsutism_moderate: 8.0
+      mfg_hirsutism_severe: 15.0
+    deltas:
+      total_testosterone:
+        meaningful_change: 0.10
+        unit: "ng/mL"
+      free_testosterone:
+        meaningful_change: 1.0
+        unit: "pg/mL"
+      dheas:
+        meaningful_change: 30.0
+        unit: "ug/dL"
+      shbg:
+        meaningful_change: 5.0
+        unit: "nmol/L"
+      hirsutism_mfg_score:
+        meaningful_change: 2.0
+        unit: "points"
+
+  Metabolic:
+    description: "Insulin resistance, cardiometabolic profile, and adiposity"
+    citation: "2023 International PCOS Guideline: Section 4 (Cardiometabolic risk assessment, OGTT, HOMA-IR, lipid profile)"
+    expected_fields:
+      - weight
+      - bmi
+      - waist_circumference
+      - fasting_glucose
+      - fasting_insulin
+      - hba1c
+      - homa_ir
+      - systolic_bp
+      - diastolic_bp
+      - triglycerides
+      - hdl
+      - ldl
+    thresholds:
+      fasting_glucose_elevated: 100.0 # mg/dL
+      fasting_glucose_diabetic: 126.0 # mg/dL
+      fasting_insulin_elevated: 12.0 # uIU/mL
+      fasting_insulin_severe: 20.0 # uIU/mL
+      hba1c_prediabetes: 5.7 # %
+      hba1c_diabetes: 6.5 # %
+      homa_ir_borderline: 2.0
+      homa_ir_elevated: 2.5
+      homa_ir_severe: 3.8
+      systolic_bp_elevated: 130.0 # mmHg
+      diastolic_bp_elevated: 85.0 # mmHg
+      triglycerides_elevated: 150.0 # mg/dL
+      hdl_low: 50.0 # mg/dL for females
+      ldl_elevated: 130.0 # mg/dL
+    deltas:
+      weight:
+        meaningful_change: 2.0 # kg
+        unit: "kg"
+      bmi:
+        meaningful_change: 0.8
+        unit: "kg/m2"
+      waist_circumference:
+        meaningful_change: 2.5 # cm
+        unit: "cm"
+      fasting_glucose:
+        meaningful_change: 7.0 # mg/dL
+        unit: "mg/dL"
+      fasting_insulin:
+        meaningful_change: 3.0 # uIU/mL
+        unit: "uIU/mL"
+      homa_ir:
+        meaningful_change: 0.4 # index points
+        unit: "index"
+      hba1c:
+        meaningful_change: 0.3 # %
+        unit: "%"
+      systolic_bp:
+        meaningful_change: 10.0 # mmHg
+        unit: "mmHg"
+      diastolic_bp:
+        meaningful_change: 6.0 # mmHg
+        unit: "mmHg"
+      triglycerides:
+        meaningful_change: 20.0
+        unit: "mg/dL"
+      hdl:
+        meaningful_change: 5.0
+        unit: "mg/dL"
+      ldl:
+        meaningful_change: 15.0
+        unit: "mg/dL"
+
+  Lifestyle:
+    description: "Physical activity volume, dietary nutrition quality, alcohol and smoking habits"
+    citation: "2023 International PCOS Guideline: Section 3 (Lifestyle management recommendations: >=150 min/wk moderate activity)"
+    expected_fields:
+      - activity_minutes_week
+      - diet_quality_score # 1 (poor) to 10 (optimal Mediterranean/anti-inflammatory)
+      - smoking_status # 0 = non-smoker, 1 = former, 2 = current
+      - alcohol_drinks_week
+    thresholds:
+      activity_target_min: 150 # min/week
+      activity_sedentary_max: 60 # min/week
+      diet_quality_poor_max: 4.0 # out of 10
+      alcohol_heavy_min: 7 # drinks/week for women
+    deltas:
+      activity_minutes_week:
+        meaningful_change: 30.0 # min
+        unit: "min/week"
+      diet_quality_score:
+        meaningful_change: 2.0
+        unit: "points"
+      alcohol_drinks_week:
+        meaningful_change: 3.0
+        unit: "drinks/week"
+
+  Psychological:
+    description: "Validated affective screens for depressive and anxiety symptoms"
+    citation: "2023 International PCOS Guideline: Section 2.4 (Screening with PHQ-9 and GAD-7 recommended at initial and follow-up visits)"
+    expected_fields:
+      - phq9_score
+      - gad7_score
+    thresholds:
+      phq9_mild: 5
+      phq9_moderate: 10
+      phq9_moderately_severe: 15
+      phq9_severe: 20
+      gad7_mild: 5
+      gad7_moderate: 10
+      gad7_severe: 15
+    deltas:
+      phq9_score:
+        meaningful_change: 3.0 # points
+        unit: "points"
+      gad7_score:
+        meaningful_change: 3.0 # points
+        unit: "points"
+
+  Sleep:
+    description: "Sleep duration, restorative quality, and obstructive sleep apnea screening symptoms"
+    citation: "2023 International PCOS Guideline: Section 2.5 (Screening for obstructive sleep apnea symptoms / STOP-BANG in high-risk patients)"
+    expected_fields:
+      - sleep_hours
+      - sleep_quality_score # 1 (severely disrupted) to 10 (restorative)
+      - snoring_or_apnea_signs # 0 = none, 1 = occasional snoring, 2 = frequent snoring / daytime fatigue, 3 = witnessed gasping/apnea
+      - daytime_sleepiness_epworth # 0 to 24 (Epworth scale)
+    thresholds:
+      sleep_hours_minimum: 7.0
+      sleep_hours_deficit: 6.0
+      sleep_quality_poor_max: 4.0
+      epworth_elevated: 10
+    deltas:
+      sleep_hours:
+        meaningful_change: 1.0 # hour
+        unit: "hours"
+      sleep_quality_score:
+        meaningful_change: 2.0 # points
+        unit: "points"
+      daytime_sleepiness_epworth:
+        meaningful_change: 3.0 # points
+        unit: "points"
+
+  Other:
+    description: "Differential diagnosis lab panels (not scored in the 6 primary domains)"
+    citation: "Rotterdam Criteria 2003 / 2023 Guidelines (Exclusion of thyroid dysfunction, hyperprolactinemia, non-classical CAH)"
+    expected_fields:
+      - lh_fsh_ratio
+      - amh
+      - prolactin
+      - tsh
+    thresholds:
+      tsh_normal_min: 0.4
+      tsh_normal_max: 4.0
+      prolactin_normal_max: 25.0
+      amh_elevated: 4.5

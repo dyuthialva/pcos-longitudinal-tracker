@@ -1,0 +1,217 @@
+# Lab Parameter Aliases & Canonical Unit Conversion Config
+# PCOS Longitudinal Decision Support System
+
+parameters:
+  total_testosterone:
+    domain: Hyperandrogenism
+    canonical_unit: "ng/mL"
+    aliases:
+      - "total testosterone"
+      - "testosterone total"
+      - "testosterone, total"
+      - "s. testosterone"
+      - "serum testosterone"
+      - "t (total)"
+      - "testosterone"
+    conversions:
+      "ng/ml": 1.0
+      "ng/dl": 0.01          # 100 ng/dL = 1 ng/mL
+      "nmol/l": 0.2884       # 1 nmol/L = 0.2884 ng/mL (MW ~ 288.4)
+      "ug/l": 1.0
+
+  free_testosterone:
+    domain: Hyperandrogenism
+    canonical_unit: "pg/mL"
+    aliases:
+      - "free testosterone"
+      - "testosterone, free"
+      - "s. free testosterone"
+      - "serum free testosterone"
+      - "ft"
+    conversions:
+      "pg/ml": 1.0
+      "pmol/l": 0.2884       # pg/mL ~ pmol/L * 0.2884
+      "ng/dl": 10.0
+
+  dheas:
+    domain: Hyperandrogenism
+    canonical_unit: "ug/dL"
+    aliases:
+      - "dheas"
+      - "dhea-s"
+      - "dhea sulfate"
+      - "dhea-sulfate"
+      - "dehydroepiandrosterone sulfate"
+      - "s. dheas"
+      - "serum dheas"
+    conversions:
+      "ug/dl": 1.0
+      "ug/ml": 100.0
+      "umol/l": 36.85        # 1 umol/L ~ 36.85 ug/dL
+      "mg/l": 100.0
+
+  shbg:
+    domain: Hyperandrogenism
+    canonical_unit: "nmol/L"
+    aliases:
+      - "shbg"
+      - "sex hormone binding globulin"
+      - "s. shbg"
+      - "serum shbg"
+    conversions:
+      "nmol/l": 1.0
+      "ug/ml": 10.5
+      "mg/l": 10.5
+
+  fasting_glucose:
+    domain: Metabolic
+    canonical_unit: "mg/dL"
+    aliases:
+      - "fasting glucose"
+      - "glucose, fasting"
+      - "glucose fasting"
+      - "fasting blood sugar"
+      - "fbs"
+      - "blood sugar fasting"
+      - "plasma glucose fasting"
+      - "s. glucose (f)"
+      - "glucose"
+    conversions:
+      "mg/dl": 1.0
+      "mmol/l": 18.0182      # 1 mmol/L = 18.0182 mg/dL
+
+  fasting_insulin:
+    domain: Metabolic
+    canonical_unit: "uIU/mL"
+    aliases:
+      - "fasting insulin"
+      - "insulin, fasting"
+      - "insulin fasting"
+      - "serum insulin (fasting)"
+      - "s. insulin fasting"
+      - "fasting serum insulin"
+      - "insulin"
+    conversions:
+      "uiu/ml": 1.0
+      "miu/l": 1.0
+      "pmol/l": 0.144        # 1 uIU/mL = 6.945 pmol/L
+
+  hba1c:
+    domain: Metabolic
+    canonical_unit: "%"
+    aliases:
+      - "hba1c"
+      - "glycated hemoglobin"
+      - "glycated haemoglobin"
+      - "glycosylated hemoglobin"
+      - "a1c"
+      - "hb a1c (ngsp)"
+      - "hba1c (ngsp)"
+      - "hemoglobin a1c"
+    conversions:
+      "%": 1.0
+      "mmol/mol": 0.09148
+
+  triglycerides:
+    domain: Metabolic
+    canonical_unit: "mg/dL"
+    aliases:
+      - "triglycerides"
+      - "triglyceride"
+      - "s. triglycerides"
+      - "serum triglycerides"
+      - "tgl"
+      - "tg"
+    conversions:
+      "mg/dl": 1.0
+      "mmol/l": 88.57
+
+  hdl:
+    domain: Metabolic
+    canonical_unit: "mg/dL"
+    aliases:
+      - "hdl"
+      - "hdl cholesterol"
+      - "hdl-c"
+      - "high density lipoprotein"
+      - "s. hdl cholesterol"
+    conversions:
+      "mg/dl": 1.0
+      "mmol/l": 38.67
+
+  ldl:
+    domain: Metabolic
+    canonical_unit: "mg/dL"
+    aliases:
+      - "ldl"
+      - "ldl cholesterol"
+      - "ldl-c"
+      - "low density lipoprotein"
+      - "s. ldl cholesterol"
+    conversions:
+      "mg/dl": 1.0
+      "mmol/l": 38.67
+
+  amh:
+    domain: Other
+    canonical_unit: "ng/mL"
+    aliases:
+      - "amh"
+      - "anti-mullerian hormone"
+      - "anti mullerian hormone"
+      - "anti-müllerian hormone"
+      - "s. amh"
+    conversions:
+      "ng/ml": 1.0
+      "pmol/l": 0.14         # 1 ng/mL = 7.14 pmol/L
+
+  tsh:
+    domain: Other
+    canonical_unit: "uIU/mL"
+    aliases:
+      - "tsh"
+      - "thyroid stimulating hormone"
+      - "s. tsh"
+      - "serum tsh"
+      - "ultrasensitive tsh"
+    conversions:
+      "uiu/ml": 1.0
+      "miu/l": 1.0
+      "uiu/l": 0.001
+
+  prolactin:
+    domain: Other
+    canonical_unit: "ng/mL"
+    aliases:
+      - "prolactin"
+      - "s. prolactin"
+      - "serum prolactin"
+      - "prl"
+    conversions:
+      "ng/ml": 1.0
+      "ug/l": 1.0
+      "miu/l": 0.047
+
+  lh:
+    domain: Other
+    canonical_unit: "mIU/mL"
+    aliases:
+      - "lh"
+      - "luteinizing hormone"
+      - "s. lh"
+      - "serum lh"
+    conversions:
+      "miu/ml": 1.0
+      "iu/l": 1.0
+
+  fsh:
+    domain: Other
+    canonical_unit: "mIU/mL"
+    aliases:
+      - "fsh"
+      - "follicle stimulating hormone"
+      - "s. fsh"
+      - "serum fsh"
+    conversions:
+      "miu/ml": 1.0
+      "iu/l": 1.0

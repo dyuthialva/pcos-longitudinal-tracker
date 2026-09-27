@@ -30,7 +30,23 @@ function usePatientChart(): {
 export const OverviewRoute: FC = () => {
   const navigate = useNavigate();
   const { patient, selectedVisit, onSelectVisit } = usePatientChart();
-  if (!patient || !selectedVisit) return <EmptyState title="No visit selected" description="This record has no visits yet." />;
+  if (!patient) return <EmptyState title="Patient not found" description="Unable to find this record." />;
+  if (!selectedVisit) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-lg p-8 max-w-lg mx-auto text-center space-y-4 my-8 shadow-xs">
+        <h3 className="text-base font-semibold text-slate-900">No Visits Recorded Yet</h3>
+        <p className="text-xs text-slate-500">
+          Patient {patient.id} has been registered, but has no clinical encounters logged yet.
+        </p>
+        <button
+          onClick={() => navigate(`/patients/${patient.id}/visits`)}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-md shadow-xs cursor-pointer transition-colors"
+        >
+          Log Initial Encounter
+        </button>
+      </div>
+    );
+  }
   return (
     <OverviewPage
       patient={patient}
@@ -44,11 +60,11 @@ export const OverviewRoute: FC = () => {
 export const VisitsRoute: FC = () => {
   const navigate = useNavigate();
   const { patient, selectedVisit, onSelectVisit } = usePatientChart();
-  if (!patient || !selectedVisit) return <EmptyState title="No visit selected" description="This record has no visits yet." />;
+  if (!patient) return <EmptyState title="Patient not found" description="Unable to find this patient." />;
   return (
     <VisitsPage
       patient={patient}
-      selectedVisitId={selectedVisit.id}
+      selectedVisitId={selectedVisit?.id || ''}
       onSelectVisit={onSelectVisit}
       onNavigateToOverview={() => navigate(`/patients/${patient.id}`)}
     />

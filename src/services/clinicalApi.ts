@@ -23,8 +23,8 @@ const MOCK_DOCTORS: Array<DoctorProfile & { password: string }> = [
 ];
 
 const MOCK_DELAY_MS = 80;
-const MAX_FAILED_ATTEMPTS = 5; {/* After 5 failed attempts, lockout for 1 minute */}
-const LOCKOUT_MS = 60_000;    {/* 1 minute lockout after too many failed attempts */}
+const MAX_FAILED_ATTEMPTS = 5; {/* After 5 failed attempts, lockout for 1 minute */ }
+const LOCKOUT_MS = 60_000; {/* 1 minute lockout after too many failed attempts */ }
 
 type UnauthorizedHandler = () => void;
 
@@ -90,7 +90,21 @@ async function liveRequest<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   if (!response.ok) {
-    throw new Error('Unable to complete the request. Try again.');
+    let errorDetail = 'Unable to complete the request. Try again.';
+    try {
+      const errorJson = await response.json();
+      if (errorJson && errorJson.detail) {
+        if (typeof errorJson.detail === 'string') {
+          errorDetail = errorJson.detail;
+        } else if (Array.isArray(errorJson.detail)) {
+          errorDetail = errorJson.detail.map((d: any) => d.msg || JSON.stringify(d)).join('; ');
+        }
+      }
+    } catch {
+      // fallback to status text
+      if (response.statusText) errorDetail = response.statusText;
+    }
+    throw new Error(errorDetail);
   }
 
   if (response.status === 204) {
@@ -230,6 +244,37 @@ export const ClinicalApiService = {
     return delay(MOCK_PATIENTS.map((p) => ({ ...p })));
   },
 
+  async createPatient(data: {
+    id?: string;
+    syntheticCohortLabel: string;
+    age: number;
+    populationEthnicityTag?: string;
+    notes?: string;
+  }): Promise<{ patient_id: string; synthetic_cohort_label: string; age: number }> {
+    if (useLiveApi()) {
+      return liveRequest('/api/v1/patients', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    }
+    requireMockAuth();
+    const pid = data.id || `P-${MOCK_PATIENTS.length + 101}`;
+    const newPat: Patient = {
+      id: pid,
+      syntheticCohortLabel: data.syntheticCohortLabel,
+      age: data.age,
+      firstVisitDate: '27 Sep 2026',
+      latestVisitDate: '27 Sep 2026',
+      totalVisits: 0,
+      dataCompleteness: 100,
+      lastUpdated: '27 Sep 2026',
+      notes: data.notes,
+      visits: [],
+    };
+    MOCK_PATIENTS.unshift(newPat);
+    return delay({ patient_id: pid, synthetic_cohort_label: data.syntheticCohortLabel, age: data.age });
+  },
+
   async getPatient(patientId: string): Promise<Patient | null> {
     if (useLiveApi()) {
       return liveRequest<Patient>(`/api/patients/${encodeURIComponent(patientId)}`);
@@ -267,4 +312,119 @@ export const ClinicalApiService = {
     if (!patient) return delay([]);
     return delay(extractParameterTrend(patient, parameterName));
   },
+
+  async createVisit(
+    patientId: string,
+    data: {
+      visit_date: string;
+      source_type?: string;
+      free_text_notes?: string;
+      observations: Array<{
+        domain: string;
+        parameter: string;
+        numeric_value?: number;
+        text_value?: string;
+        unit?: string;
+        measurement_status?: string;
+      }>;
+    }
+  ): Promise<{ visit_id: string; visit_number: number; visit_date: string }> {
+    if (useLiveApi()) {
+      return liveRequest(`/api/v1/patients/${encodeURIComponent(patientId)}/visits`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    }
+    requireMockAuth();
+    return delay({
+      visit_id: `v${Date.now()}-${patientId}`,
+      visit_number: 1,
+      visit_date: data.visit_date,
+    });
+  },
+
+  async processVisit(patientId: string, visitId: string): Promise<Visit> {
+    if (useLiveApi()) {
+      return liveRequest(`/api/v1/patients/${encodeURIComponent(patientId)}/visits/${encodeURIComponent(visitId)}/process`, {
+        method: 'POST',
+      });
+    }
+    requireMockAuth();
+    throw new Error('Process visit requires live API.');
+  },
+
+  async extractLabReport(file?: File, rawText?: string): Promise<{
+    extraction_id?: string;
+    source_method: string;
+    confidence: string;
+    needs_clinician_review: boolean;
+    extracted_values?: Array<{
+      mapped_field?: string;
+      raw_label: string;
+      value: number | null;
+      unit: string;
+      canonical_unit: string;
+      original_value?: number | string;
+      confidence: string;
+      domain?: string;
+      flag?: string | null;
+    }>;
+    unmapped_lines?: Array<{ raw_label: string; raw_value: string }>;
+    flagged_for_review?: Array<{ mapped_field?: string; reason: string }>;
+    observations?: Array<{
+      domain: string;
+      parameter: string;
+      value: number | string;
+      numeric_value: number | null;
+      unit: string;
+      flag?: string | null;
+    }>;
+  }> {
+    if (useLiveApi()) {
+      const formData = new FormData();
+      if (file) {
+        formData.append('file', file);
+      }
+      if (rawText) {
+        formData.append('raw_text', rawText);
+      }
+
+      const token = readStoredToken();
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE}/api/v1/extraction/lab-pdf`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        let errDetail = 'Failed to extract lab report.';
+        try {
+          const j = await response.json();
+          if (j.detail) errDetail = j.detail;
+        } catch {
+          // ignore
+        }
+        throw new Error(errDetail);
+      }
+
+      return response.json();
+    }
+
+    return delay({
+      source_method: 'free_text',
+      confidence: 'high',
+      needs_clinician_review: false,
+      extracted_values: [
+        { mapped_field: 'fasting_glucose', raw_label: 'Fasting Glucose', value: 96, unit: 'mg/dL', canonical_unit: 'mg/dL', confidence: 'high', domain: 'Metabolic' },
+        { mapped_field: 'hba1c', raw_label: 'HbA1c', value: 5.5, unit: '%', canonical_unit: '%', confidence: 'high', domain: 'Metabolic' },
+        { mapped_field: 'total_testosterone', raw_label: 'Total Testosterone', value: 0.65, unit: 'ng/mL', canonical_unit: 'ng/mL', confidence: 'high', domain: 'Hyperandrogenism' },
+      ],
+    });
+  },
 };
+
