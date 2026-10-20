@@ -1,4 +1,4 @@
-# PCOS Longitudinal Tracker
+# PCOS Longitudinal Tracker Project
 
 A clinician-facing decision-support prototype that tracks PCOS (Polycystic Ovary Syndrome) patients longitudinally across encounters and highlights which health domains require clinician attention, based on severity, longitudinal trends, and symptom burden.
 
